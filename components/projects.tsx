@@ -52,7 +52,7 @@ const projectsData: Project[] = [
       "CSS",
     ],
     github: "https://github.com/KhadzA/RecSys1",
-    liveUrl: "rec-sys1.vercel.app",
+    liveUrl: "https://rec-sys1.vercel.app",
     isPrivate: false,
   },
   {
@@ -74,7 +74,7 @@ const projectsData: Project[] = [
     image: "/ESP32_Resto.png",
     technologies: ["Arduino", "Firebase", "ESP32", "IOT"],
     github: "https://github.com/KhadzA/ESP32_Resto",
-    liveUrl: "#", // EDIT: Add live URL if available
+    liveUrl: "https://esp32-firebase1-9e047.web.app/", // EDIT: Add live URL if available
     isPrivate: true,
   },
 ];
