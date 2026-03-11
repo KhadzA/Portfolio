@@ -4,7 +4,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 dark:bg-black text-slate-400 py-12 px-6 lg:px-16">
+    <footer className="bg-black text-slate-400 py-12 px-6 lg:px-16">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-slate-800">
           {/* About */}
@@ -13,9 +13,9 @@ export function Footer() {
               Al-khazri Alim
             </h3>
             <p className="text-sm text-slate-500">
-              Frontend developer and a Student, inexperienced but passionate
-              about learning and creating. Always eager to take on new
-              challenges and grow my skills in web development.
+              Inexperienced Developer but passionate about learning and
+              creating. Always eager to try on new challenges and grow my skills
+              in web development.
             </p>
           </div>
 
@@ -72,16 +72,6 @@ export function Footer() {
                   GitHub Profile
                 </a>
               </li>
-              {/* <li>
-                <a
-                  href="https://dev.to/khadza"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  Dev.to Blog
-                </a>
-              </li> */}
               {/* EDIT: Add more links as needed */}
             </ul>
           </div>
