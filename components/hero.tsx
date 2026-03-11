@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Linkedin, Mail, ExternalLink } from "lucide-react";
+import { Github, Linkedin, Mail, ExternalLink, Hash } from "lucide-react";
 
 export function Hero() {
   return (
@@ -43,6 +43,15 @@ export function Hero() {
           >
             <Github size={20} />
             GitHub
+          </a>
+          <a
+            href="https://dev.to/khadz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-900 rounded-lg hover:bg-slate-100 transition-colors font-medium"
+          >
+            <Hash size={20} />
+            Dev.to
           </a>
           {/* EDIT: Add more social links as needed */}
         </div>
