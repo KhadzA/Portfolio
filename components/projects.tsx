@@ -41,13 +41,14 @@ const projectsData: Project[] = [
     id: "3",
     title: "Recruitment System",
     description:
-      "A recruitment system that stores user application to Google sheets",
+      "A recruitment system that collects applicant data into Google Sheets and provides an HR dashboard to manage applications, update statuses, and create job listings dynamically—eliminating the need to switch between multiple tabs.",
     image: "/recsys.png", // EDIT: Replace with your actual project image
     technologies: [
       "React",
       "Typescript",
       "AppScript",
       "Google Sheets",
+      "Supabase",
       "Vercel",
       "CSS",
     ],
