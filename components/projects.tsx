@@ -28,13 +28,13 @@ const projectsData: Project[] = [
   },
   {
     id: "2",
-    title: "Library Management System",
+    title: "Library Management System (alimbrary)",
     description:
       "Library system for managing books, users, and reading feature with admin dashboard.",
     image: "/library.png",
     technologies: ["JavaScript", "Node.js", "MySQL", "CSS", "HTML"],
     github: "https://github.com/KhadzA/Library",
-    liveUrl: "#",
+    liveUrl: "https://alimbrary.vercel.app",
     isPrivate: false,
   },
   {
