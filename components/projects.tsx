@@ -42,7 +42,7 @@ const projectsData: Project[] = [
     title: "Recruitment System",
     description:
       "A recruitment system that collects applicant data into Google Sheets and provides an HR dashboard to manage applications, update statuses, and create job listings dynamically—eliminating the need to switch between multiple tabs.",
-    image: "/recsys.png", // EDIT: Replace with your actual project image
+    image: "/recsys.png",
     technologies: [
       "React",
       "Typescript",
