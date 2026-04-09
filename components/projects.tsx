@@ -54,7 +54,7 @@ const projectsData: Project[] = [
     ],
     github: "https://github.com/KhadzA/RecSys1",
     liveUrl: "https://rec-sys1.vercel.app",
-    isPrivate: false,
+    isPrivate: true,
   },
   {
     id: "4",
