@@ -161,6 +161,7 @@ function App() {
       </section>
       <section id="contribution">
         <h1>Contribution Section</h1>
+        {/* This is supposed to be a section for highlighting contributions on my github profile and any contributions made but I don't know how */}
       </section>
       <section id="education">
         <h1>Education Section</h1>
