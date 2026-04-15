@@ -1,9 +1,9 @@
 
 import './App.css'
 import { FaHome, FaUser, FaCode, FaGithub, FaUserGraduate, FaPhone, FaHtml5, FaCss3Alt, FaReact, FaPhp, FaNode, FaGitAlt, FaQuestion, FaRegEye } from "react-icons/fa"
-import { BsJavascript } from "react-icons/bs";
-import { SiMysql, SiVite } from "react-icons/si";
-import { RiSupabaseFill, RiSupabaseLine, RiFirebaseFill, RiFirebaseLine } from "react-icons/ri";
+import { BsJavascript, BsTypescript, BsMotherboard, BsMotherboardFill } from "react-icons/bs";
+import { SiMysql, SiVite, SiGoogleappsscript, SiGooglesheets, SiXampp, SiArduino, SiCplusplus } from "react-icons/si";
+import { RiSupabaseFill, RiSupabaseLine, RiFirebaseFill, RiFirebaseLine, RiTailwindCssFill } from "react-icons/ri";
 import { VscVscode } from "react-icons/vsc";
 import { FaHandshake } from "react-icons/fa6";
 
@@ -98,6 +98,8 @@ function App() {
             <span><FaGithub />Github</span>
             <span><VscVscode />VSCode</span>
             <span><SiVite />Vite</span>
+            <span><SiXampp />XAMPP</span>
+
 
             <div className="proficiency">
               <p>Proficiency: <span>Intermediate</span></p>
@@ -120,6 +122,11 @@ function App() {
           <img src="" alt="portfolioImage" />
           <h3>Personal Portfolio Website</h3>
           <p>A responsive portfolio website built with React Vite.</p>
+          <div className="techUsed">
+            <span>React</span>
+            <span>Vite</span>
+            <span>CSS</span>
+          </div>
           <button className="showSourceCode">View Project</button>
           <button className="noDemo">Live Demo</button>
         </div>
@@ -127,6 +134,12 @@ function App() {
           <img src="" alt="alimbraryImage" />
           <h3>Library Management System (Alimbrary)</h3>
           <p>Library system for managing books, users, and reading feature with admin dashboard.</p>
+          <div className="techUsed">
+            <span>React</span>
+            <span>Vite</span>
+            <span>Javascript</span>
+            <span>Node.js</span>
+          </div>
           <button className="showSourceCode">View Project</button>
           <button className="demoShow">Live Demo</button>
         </div>
@@ -134,6 +147,14 @@ function App() {
           <img src="" alt="recruitmentImage" />
           <h3>Recruitment System Form</h3>
           <p>Collects applicant data into Google Sheets and provides an HR dashboard to manage applications, update statuses, and create job listings dynamically, Alternative for once was google forms.</p>
+          <div className="techUsed">
+            <span>React</span>
+            <span>Vite</span>
+            <span>TypeScript</span>
+            <span>Appscript</span>
+            <span>Supabase</span>
+            <span>Google Sheets</span>
+          </div>
           <button className="privateSourceCode">View Project</button>
           <button className="demoShow">Live Demo</button>
         </div>
@@ -141,6 +162,15 @@ function App() {
           <img src="" alt="assessmentImage" />
           <h3>Assessment System</h3>
           <p>System that assesses applicant from recruitment system through various tests stored in the same sheets as the recruitment system.</p>
+          <div className="techUsed">
+            <span>React</span>
+            <span>Vite</span>
+            <span>Tailwind</span>
+            <span>TypeScript</span>
+            <span>Appscript</span>
+            <span>Supabase</span>
+            <span>Google Sheets</span>
+          </div>
           <button className="privateSourceCode">View Project</button>
           <button className="demoShow">Live Demo</button>
         </div>
@@ -148,6 +178,14 @@ function App() {
           <img src="" alt="cafeImage" />
           <h3>Cafe Management Web app</h3>
           <p>Point-of-sale and management system, Software engineering project 3rd year.</p>
+          <div className="techUsed">
+            <span>PHP</span>
+            <span>HTML</span>
+            <span>CSS</span>
+            <span>Javascript</span>
+            <span>MySQL</span>
+            <span>XAMPP</span>
+          </div>
           <button className="privateSourceCode">View Project</button>
           <button className="noDemo">Live Demo</button>
         </div>
@@ -155,6 +193,13 @@ function App() {
           <img src="" alt="restoImage" />
           <h3>ESP Resto</h3>
           <p>A table reservation using IOT devices, a 2nd year project for IOT.</p>
+          <div className="techUsed">
+            <span>Arduino</span>
+            <span>IOT</span>
+            <span>Firebase</span>
+            <span>ESP32</span>
+            <span>C++</span>
+          </div>
           <button className="privateSourceCode">View Project</button>
           <button className="noDemo">Live Demo</button>
         </div>
