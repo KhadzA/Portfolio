@@ -74,7 +74,7 @@ const PROJECTS = [
     desc: 'A responsive portfolio website built with React Vite.',
     tech: ['React', 'Vite', 'CSS'],
     viewClass: 'btn-view', viewUrl: 'https://github.com/KhadzA/Portfolio',
-    demoClass: 'btn-disabled', demoUrl: 'https://alimun.vercel.app',
+    demoClass: 'btn-demo', demoUrl: 'https://alimun.vercel.app',
     preview: '/previews/portfolio.png',
     num: '01',
   },
