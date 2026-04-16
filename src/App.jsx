@@ -645,6 +645,4 @@ function App() {
   );
 }
 
-// I still don't know how to redeploye manually in vercel 💀
-
 export default App;
