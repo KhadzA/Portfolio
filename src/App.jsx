@@ -67,7 +67,6 @@ const SKILLS = [
   },
 ];
 
-
 const PROJECTS = [
   {
     title: 'Personal Portfolio Website',
@@ -153,6 +152,47 @@ const CERTS = [
   },
 ];
 
+// ── GitHub GraphQL query ──────────────────────────────────────────────────────
+const GH_QUERY = `
+  query {
+    user(login: "KhadzA") {
+      contributionsCollection {
+        contributionCalendar {
+          weeks {
+            contributionDays {
+              date
+              contributionCount
+            }
+          }
+        }
+        commitContributionsByRepository(maxRepositories: 10) {
+          repository {
+            nameWithOwner
+            url
+          }
+          contributions {
+            totalCount
+          }
+        }
+        pullRequestContributions(first: 10) {
+          nodes {
+            pullRequest {
+              title
+              url
+              createdAt
+              state
+              repository {
+                nameWithOwner
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 function App() {
   const [isDark, setIsDark] = useState(true);
   const [scrollY, setScrollY] = useState(0);
@@ -160,9 +200,10 @@ function App() {
   const [cursorBig, setCursorBig] = useState({ x: -100, y: -100 });
   const [activeSection, setActiveSection] = useState('home');
   const [contribData, setContribData] = useState([]);
+  const [hasPrivate, setHasPrivate] = useState(false);
+  const [activityData, setActivityData] = useState({ commits: [], pullRequests: [] });
   const cursorBigRef = useRef({ x: -100, y: -100 });
   const rafRef = useRef(null);
-
 
   const [ghStats, setGhStats] = useState({
     total: 0,
@@ -184,15 +225,62 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* ── Fetch contributions + activity ─────────────────────────────────────── */
   useEffect(() => {
-    fetch('https://github-contributions-api.jogruber.de/v4/KhadzA?y=last')
-      .then(r => r.json())
-      .then(data => {
-        const contributions = data.contributions;
-        setContribData(contributions);
-        setGhStats(calcStats(contributions));
+    const token = import.meta.env.VITE_GITHUB_TOKEN;
+
+    if (token) {
+      fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: GH_QUERY }),
       })
-      .catch(console.error);
+        .then(r => r.json())
+        .then(json => {
+          const col = json.data.user.contributionsCollection;
+
+          // ── Heatmap ──
+          const contributions = col.contributionCalendar.weeks.flatMap(week =>
+            week.contributionDays.map(day => ({
+              date: day.date,
+              count: day.contributionCount,
+            }))
+          );
+          setContribData(contributions);
+          setGhStats(calcStats(contributions));
+          setHasPrivate(true);
+
+          // ── Activity feed ──
+          setActivityData({
+            commits: col.commitContributionsByRepository,
+            pullRequests: col.pullRequestContributions.nodes.filter(
+              node => node !== null && node.pullRequest !== null
+            ),
+          });
+        })
+        .catch(err => {
+          console.warn('GitHub GraphQL failed, using public fallback:', err);
+          fetchPublicFallback();
+        });
+    } else {
+      fetchPublicFallback();
+    }
+
+    function fetchPublicFallback() {
+      fetch('https://github-contributions-api.jogruber.de/v4/KhadzA?y=last')
+        .then(r => r.json())
+        .then(data => {
+          setContribData(data.contributions);
+          setGhStats(calcStats(data.contributions));
+          setHasPrivate(false);
+          // No activity feed available in public fallback
+          setActivityData({ commits: [], pullRequests: [] });
+        })
+        .catch(console.error);
+    }
   }, []);
 
   /* ── Custom cursor ── */
@@ -251,14 +339,12 @@ function App() {
     const total = contributions.reduce((s, d) => s + d.count, 0);
     const bestDay = Math.max(...contributions.map(d => d.count));
 
-    // Current streak — count backwards from today
     let currentStreak = 0;
     for (let i = contributions.length - 1; i >= 0; i--) {
       if (contributions[i].count > 0) currentStreak++;
       else break;
     }
 
-    // Longest streak
     let longestStreak = 0, running = 0;
     for (const day of contributions) {
       running = day.count > 0 ? running + 1 : 0;
@@ -267,6 +353,23 @@ function App() {
 
     return { total, currentStreak, longestStreak, bestDay };
   }
+
+  // ── Helper: format relative date ──
+  function timeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return 'today';
+    if (days === 1) return 'yesterday';
+    if (days < 30) return `${days} days ago`;
+    const months = Math.floor(days / 30);
+    return `${months} month${months > 1 ? 's' : ''} ago`;
+  }
+
+  // ── Total commits across all repos ──
+  const totalCommits = activityData.commits.reduce(
+    (s, r) => s + r.contributions.totalCount, 0
+  );
+  const maxCommits = activityData.commits[0]?.contributions.totalCount || 1;
 
   return (
     <div className="content">
@@ -353,7 +456,6 @@ function App() {
           </div>
         </div>
 
-        {/* Hero Content — scrolls slightly slower than page for depth */}
         <div
           className="hero-content"
           style={{ transform: `translateY(${scrollY * 0.25}px)`, opacity: Math.max(0, 1 - scrollY / 600) }}
@@ -518,9 +620,28 @@ function App() {
           <h2>Contribution</h2>
           <div className="section-line" />
         </div>
+
         <div className="contrib-wrap reveal">
           <FaGithub className="contrib-gh-icon" />
           <p className="contrib-label">GitHub Contribution Graph</p>
+
+          {hasPrivate && (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              color: 'var(--cyan)',
+              background: 'rgba(0,245,255,0.07)',
+              border: '1px solid rgba(0,245,255,0.2)',
+              borderRadius: '4px',
+              padding: '3px 10px',
+              marginTop: '-8px',
+            }}>
+              🔒 Includes private contributions
+            </span>
+          )}
 
           <div className="gh-stats-row">
             {[
@@ -536,8 +657,8 @@ function App() {
               </div>
             ))}
           </div>
+
           <div className="contrib-grid">
-            {/* Group flat array into weeks of 7 */}
             {Array.from({ length: 52 }, (_, w) =>
               contribData.slice(w * 7, w * 7 + 7)
             ).map((week, w) => (
@@ -556,6 +677,99 @@ function App() {
               </div>
             ))}
           </div>
+
+          {/* ── Activity Feed (only shown when token is set) ── */}
+          {(activityData.commits.length > 0 || activityData.pullRequests.length > 0) && (
+            <div className="activity-feed">
+
+              {/* ── Commit activity ── */}
+              {activityData.commits.length > 0 && (
+                <div className="activity-block">
+                  <div className="activity-block-header">
+                    <span className="activity-dot commit-dot" />
+                    <span>
+                      Created <strong>{totalCommits}</strong> commits in <strong>{activityData.commits.length}</strong> {activityData.commits.length === 1 ? 'repository' : 'repositories'}
+                    </span>
+                  </div>
+                  <div className="activity-repos">
+                    {activityData.commits.map(r => {
+                      const pct = (r.contributions.totalCount / maxCommits) * 100;
+                      return (
+                        <div key={r.repository.nameWithOwner} className="activity-repo-row">
+                          <a
+                            href={r.repository.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="activity-repo-name"
+                          >
+                            {r.repository.nameWithOwner}
+                          </a>
+                          <span className="activity-repo-count">
+                            {r.contributions.totalCount} {r.contributions.totalCount === 1 ? 'commit' : 'commits'}
+                          </span>
+                          <div className="activity-bar">
+                            <div
+                              className="activity-bar-fill"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Pull request activity ── */}
+              {activityData.pullRequests.length > 0 && (
+                <div className="activity-block">
+                  <div className="activity-block-header">
+                    <span className="activity-dot pr-dot" />
+                    <span>
+                      Opened <strong>{activityData.pullRequests.length}</strong> pull {activityData.pullRequests.length === 1 ? 'request' : 'requests'}
+                    </span>
+                  </div>
+                  <div className="activity-prs">
+                    {activityData.pullRequests.map(({ pullRequest: pr }) => (
+                      <div key={pr.url} className="activity-pr-row">
+                        <div className="activity-pr-left">
+                          <svg className="pr-icon" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354Z" />
+                          </svg>
+                          <div className="activity-pr-info">
+                            <a
+                              href={pr.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="activity-pr-title"
+                            >
+                              {pr.title}
+                            </a>
+                            <a
+                              href={pr.repository.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="activity-pr-repo"
+                            >
+                              {pr.repository.nameWithOwner}
+                            </a>
+                          </div>
+                        </div>
+                        <div className="activity-pr-right">
+                          <span className={`activity-pr-state state-${pr.state.toLowerCase()}`}>
+                            {pr.state.charAt(0) + pr.state.slice(1).toLowerCase()}
+                          </span>
+                          <span className="activity-pr-date">{timeAgo(pr.createdAt)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -637,8 +851,8 @@ function App() {
       </section>
 
       <footer className="footer">
-        <p>&copy; 2026 Al-khazri Alim. All rights reserved.</p>
         <div className="footer-line" />
+        <p>&copy; 2026 Al-khazri Alim. All rights reserved.</p>
       </footer>
 
     </div>
