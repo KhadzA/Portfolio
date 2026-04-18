@@ -730,14 +730,6 @@ function App() {
                             <path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354Z" />
                           </svg>
                           <div className="activity-pr-info">
-                            <a
-                              href={pr.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="activity-pr-title"
-                            >
-                              {pr.title}
-                            </a>
                             <span className="activity-pr-title">{pr.title}</span>
                           </div>
                         </div>
@@ -757,12 +749,12 @@ function App() {
           )}
 
         </div>
-      </section>
+      </section >
 
       {/* ══════════════════════════════════════════
           EDUCATION
       ══════════════════════════════════════════ */}
-      <section id="education" className="section">
+      < section id="education" className="section" >
         <div className="section-head reveal">
           <span className="section-num">// 04</span>
           <h2>Education &amp; Certifications</h2>
@@ -805,12 +797,12 @@ function App() {
             </div>
           ))}
         </div>
-      </section>
+      </section >
 
       {/* ══════════════════════════════════════════
           CONTACT
       ══════════════════════════════════════════ */}
-      <section id="contact" className="section section-contact">
+      < section id="contact" className="section section-contact" >
         <div className="section-head reveal">
           <span className="section-num">// 05</span>
           <h2>Contact</h2>
@@ -834,14 +826,14 @@ function App() {
             </a>
           </div>
         </div>
-      </section>
+      </section >
 
       <footer className="footer">
         <div className="footer-line" />
         <p>&copy; 2026 Al-khazri Alim. All rights reserved.</p>
       </footer>
 
-    </div>
+    </div >
   );
 }
 
