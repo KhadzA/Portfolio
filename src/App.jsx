@@ -625,24 +625,6 @@ function App() {
           <FaGithub className="contrib-gh-icon" />
           <p className="contrib-label">GitHub Contribution Graph</p>
 
-          {hasPrivate && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '11px',
-              color: 'var(--cyan)',
-              background: 'rgba(0,245,255,0.07)',
-              border: '1px solid rgba(0,245,255,0.2)',
-              borderRadius: '4px',
-              padding: '3px 10px',
-              marginTop: '-8px',
-            }}>
-              🔒 Includes private contributions
-            </span>
-          )}
-
           <div className="gh-stats-row">
             {[
               { label: 'Total Contributions', value: ghStats.total, icon: '⬡' },
@@ -712,39 +694,6 @@ function App() {
                   </div>
                 </div>
               )}
-
-              {/* ── Pull request activity ── */}
-              {activityData.pullRequests.length > 0 && (
-                <div className="activity-block">
-                  <div className="activity-block-header">
-                    <span className="activity-dot pr-dot" />
-                    <span>
-                      Opened <strong>{activityData.pullRequests.length}</strong> pull {activityData.pullRequests.length === 1 ? 'request' : 'requests'}
-                    </span>
-                  </div>
-                  <div className="activity-prs">
-                    {activityData.pullRequests.map(({ pullRequest: pr }) => (
-                      <div key={pr.url} className="activity-pr-row">
-                        <div className="activity-pr-left">
-                          <svg className="pr-icon" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354Z" />
-                          </svg>
-                          <div className="activity-pr-info">
-                            <span className="activity-pr-title">{pr.title}</span>
-                          </div>
-                        </div>
-                        <div className="activity-pr-right">
-                          <span className={`activity-pr-state state-${pr.state.toLowerCase()}`}>
-                            {pr.state.charAt(0) + pr.state.slice(1).toLowerCase()}
-                          </span>
-                          <span className="activity-pr-date">{timeAgo(pr.createdAt)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
             </div>
           )}
 
