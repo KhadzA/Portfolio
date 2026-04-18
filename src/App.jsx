@@ -696,14 +696,7 @@ function App() {
                       const pct = (r.contributions.totalCount / maxCommits) * 100;
                       return (
                         <div key={r.repository.nameWithOwner} className="activity-repo-row">
-                          <a
-                            href={r.repository.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="activity-repo-name"
-                          >
-                            {r.repository.nameWithOwner}
-                          </a>
+                          <span className="activity-repo-name">{r.repository.nameWithOwner}</span>
                           <span className="activity-repo-count">
                             {r.contributions.totalCount} {r.contributions.totalCount === 1 ? 'commit' : 'commits'}
                           </span>
@@ -745,14 +738,7 @@ function App() {
                             >
                               {pr.title}
                             </a>
-                            <a
-                              href={pr.repository.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="activity-pr-repo"
-                            >
-                              {pr.repository.nameWithOwner}
-                            </a>
+                            <span className="activity-pr-title">{pr.title}</span>
                           </div>
                         </div>
                         <div className="activity-pr-right">
