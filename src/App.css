@@ -1385,39 +1385,75 @@ html.light .tech-tag {
 }
 
 /* ════════════════════════════════════════════════════
-   CONTRIBUTION
+   CONTRIBUTION — redesigned
 ════════════════════════════════════════════════════ */
 .contrib-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 40px;
+    border-radius: 16px;
+    padding: 32px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    gap: 24px;
     transition: background 0.35s, border-color 0.35s;
 }
 
+/* ── Header row ── */
+.contrib-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.contrib-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .contrib-gh-icon {
-    font-size: 40px;
+    font-size: 22px;
     color: var(--text-dim);
     transition: color 0.35s;
 }
 
 .contrib-label {
     font-family: var(--font-display);
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-dim);
     letter-spacing: 1px;
     transition: color 0.35s;
 }
 
+.contrib-private-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    background: rgba(0, 245, 255, 0.07);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 4px;
+    padding: 3px 10px;
+    transition: color 0.35s;
+}
+
+/* ── Heatmap ── */
+.contrib-heatmap-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-x: auto;
+}
+
 .contrib-grid {
     display: flex;
     gap: 3px;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    min-width: fit-content;
+    justify-content: center;
 }
 
 .contrib-week {
@@ -1432,6 +1468,7 @@ html.light .tech-tag {
     border-radius: 2px;
     background: rgba(255, 255, 255, 0.04);
     animation: cellAppear 0.3s ease both;
+    flex-shrink: 0;
 }
 
 html.light .contrib-cell {
@@ -1439,103 +1476,52 @@ html.light .contrib-cell {
 }
 
 .contrib-cell.level-1 {
-    background: rgba(0, 245, 255, 0.2);
+    background: rgba(0, 245, 255, 0.20);
 }
 
 .contrib-cell.level-2 {
-    background: rgba(0, 245, 255, 0.4);
+    background: rgba(0, 245, 255, 0.42);
 }
 
 .contrib-cell.level-3 {
-    background: rgba(0, 245, 255, 0.65);
+    background: rgba(0, 245, 255, 0.67);
 }
 
 .contrib-cell.level-4 {
-    background: rgba(0, 245, 255, 0.9);
+    background: rgba(0, 245, 255, 0.92);
     box-shadow: 0 0 4px rgba(0, 245, 255, 0.5);
 }
 
-/* ── Activity Feed ── */
-.activity-feed {
-    width: 100%;
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+html.light .contrib-cell.level-1 {
+    background: rgba(0, 119, 255, 0.20);
 }
 
-.activity-block {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+html.light .contrib-cell.level-2 {
+    background: rgba(0, 119, 255, 0.45);
 }
 
-.activity-block-header {
+html.light .contrib-cell.level-3 {
+    background: rgba(0, 119, 255, 0.70);
+}
+
+html.light .contrib-cell.level-4 {
+    background: rgba(0, 119, 255, 0.90);
+    box-shadow: 0 0 4px rgba(0, 119, 255, 0.5);
+}
+
+/* Legend */
+.contrib-legend {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-size: 0.9rem;
-    color: var(--text-muted, #aaa);
-}
-
-.activity-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.commit-dot {
-    background: var(--cyan, #00f5ff);
-}
-
-.pr-dot {
-    background: #a371f7;
-}
-
-/* Commit bars */
-.activity-repo-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    gap: 4px 12px;
-    align-items: center;
-}
-
-.activity-repo-name {
-    color: var(--cyan, #00f5ff);
-    font-size: 0.82rem;
-    text-decoration: none;
+    gap: 4px;
+    justify-content: flex-end;
     font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-xs);
 }
 
-.activity-repo-name:hover {
-    text-decoration: underline;
-}
-
-.activity-repo-count {
-    font-size: 0.78rem;
-    color: var(--text-muted, #aaa);
-    text-align: right;
-}
-
-.activity-bar {
-    grid-column: 1 / -1;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.activity-bar-fill {
-    height: 100%;
-    background: var(--cyan, #00f5ff);
-    border-radius: 2px;
-    transition: width 1s ease;
+.contrib-legend .contrib-cell {
+    animation: none;
 }
 
 @keyframes cellAppear {
@@ -1548,11 +1534,249 @@ html.light .contrib-cell {
     }
 }
 
-.contrib-note {
+/* ── Bottom: stats + panel ── */
+.contrib-bottom {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 5rem;
+    align-items: start;
+}
+
+@media (max-width: 760px) {
+    .contrib-bottom {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── 2×2 stat grid ── */
+.gh-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.gh-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 8px;
+    border: 1px solid color-mix(in srgb, var(--stat-color) 25%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--stat-color) 5%, transparent);
+    transition: transform 0.2s, border-color 0.35s;
+}
+
+.gh-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--stat-color) 50%, transparent);
+}
+
+.gh-stat-icon {
+    font-size: 1.1rem;
+}
+
+.gh-stat-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--stat-color);
+    line-height: 1;
+}
+
+.gh-stat-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    transition: color 0.35s;
+}
+
+/* ── Activity panel (repo list) ── */
+.activity-panel {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background 0.35s, border-color 0.35s;
+}
+
+html.light .activity-panel {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.activity-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.activity-panel-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.commit-dot {
+    background: var(--cyan);
+}
+
+.activity-panel-title {
+    font-size: 13px;
+    color: var(--text-dim);
+    transition: color 0.35s;
+}
+
+.activity-panel-title strong {
+    color: var(--text);
+    transition: color 0.35s;
+}
+
+/* Legend row for badges */
+.activity-legend {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* ── Scrollable repo list ── */
+.activity-repos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.activity-repos-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.activity-repos-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.activity-repos-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* ── Repo row ── */
+.activity-repo-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.repo-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.repo-name-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+}
+
+.repo-owner-prefix {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--text-xs);
+    flex-shrink: 0;
     transition: color 0.35s;
+}
+
+.repo-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.35s;
+}
+
+.repo-commit-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: color 0.35s;
+}
+
+/* Bar */
+.repo-bar-track {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+html.light .repo-bar-track {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.repo-bar-fill {
+    height: 100%;
+    background: var(--bar-color, var(--cyan));
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0.85;
+}
+
+/* ── Badges ── */
+.repo-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.badge-personal {
+    background: rgba(0, 245, 255, 0.08);
+    border: 1px solid rgba(0, 245, 255, 0.25);
+    color: var(--cyan);
+}
+
+html.light .badge-personal {
+    background: rgba(0, 119, 255, 0.08);
+    border-color: rgba(0, 119, 255, 0.25);
+    color: var(--cyan);
+}
+
+.badge-collab {
+    background: rgba(163, 113, 247, 0.10);
+    border: 1px solid rgba(163, 113, 247, 0.28);
+    color: #a371f7;
 }
 
 /* ════════════════════════════════════════════════════

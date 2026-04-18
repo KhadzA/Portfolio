@@ -152,7 +152,6 @@ const CERTS = [
   },
 ];
 
-// ── GitHub GraphQL query ──────────────────────────────────────────────────────
 const GH_QUERY = `
   query {
     user(login: "KhadzA") {
@@ -174,20 +173,6 @@ const GH_QUERY = `
             totalCount
           }
         }
-        pullRequestContributions(first: 10) {
-          nodes {
-            pullRequest {
-              title
-              url
-              createdAt
-              state
-              repository {
-                nameWithOwner
-                url
-              }
-            }
-          }
-        }
       }
     }
   }
@@ -201,15 +186,12 @@ function App() {
   const [activeSection, setActiveSection] = useState('home');
   const [contribData, setContribData] = useState([]);
   const [hasPrivate, setHasPrivate] = useState(false);
-  const [activityData, setActivityData] = useState({ commits: [], pullRequests: [] });
+  const [activityData, setActivityData] = useState({ commits: [] });
   const cursorBigRef = useRef({ x: -100, y: -100 });
   const rafRef = useRef(null);
 
   const [ghStats, setGhStats] = useState({
-    total: 0,
-    currentStreak: 0,
-    longestStreak: 0,
-    bestDay: 0,
+    total: 0, currentStreak: 0, longestStreak: 0, bestDay: 0,
   });
 
   useEffect(() => {
@@ -218,48 +200,30 @@ function App() {
     html.classList.add(isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  /* ── Parallax scroll ── */
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* ── Fetch contributions + activity ─────────────────────────────────────── */
   useEffect(() => {
     const token = import.meta.env.VITE_GITHUB_TOKEN;
-
     if (token) {
       fetch('https://api.github.com/graphql', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: GH_QUERY }),
       })
         .then(r => r.json())
         .then(json => {
           const col = json.data.user.contributionsCollection;
-
-          // ── Heatmap ──
           const contributions = col.contributionCalendar.weeks.flatMap(week =>
-            week.contributionDays.map(day => ({
-              date: day.date,
-              count: day.contributionCount,
-            }))
+            week.contributionDays.map(day => ({ date: day.date, count: day.contributionCount }))
           );
           setContribData(contributions);
           setGhStats(calcStats(contributions));
           setHasPrivate(true);
-
-          // ── Activity feed ──
-          setActivityData({
-            commits: col.commitContributionsByRepository,
-            pullRequests: col.pullRequestContributions.nodes.filter(
-              node => node !== null && node.pullRequest !== null
-            ),
-          });
+          setActivityData({ commits: col.commitContributionsByRepository });
         })
         .catch(err => {
           console.warn('GitHub GraphQL failed, using public fallback:', err);
@@ -268,7 +232,6 @@ function App() {
     } else {
       fetchPublicFallback();
     }
-
     function fetchPublicFallback() {
       fetch('https://github-contributions-api.jogruber.de/v4/KhadzA?y=last')
         .then(r => r.json())
@@ -276,21 +239,18 @@ function App() {
           setContribData(data.contributions);
           setGhStats(calcStats(data.contributions));
           setHasPrivate(false);
-          // No activity feed available in public fallback
-          setActivityData({ commits: [], pullRequests: [] });
+          setActivityData({ commits: [] });
         })
         .catch(console.error);
     }
   }, []);
 
-  /* ── Custom cursor ── */
   useEffect(() => {
     const onMove = (e) => {
       setCursor({ x: e.clientX, y: e.clientY });
       cursorBigRef.current = { x: e.clientX, y: e.clientY };
     };
     window.addEventListener('mousemove', onMove);
-
     const lerp = (a, b, t) => a + (b - a) * t;
     let curX = -100, curY = -100;
     const tick = () => {
@@ -300,31 +260,26 @@ function App() {
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
-
     return () => {
       window.removeEventListener('mousemove', onMove);
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
-  /* ── Intersection Observer ── */
   useEffect(() => {
     const io = new IntersectionObserver(
       (entries) => entries.forEach(e => e.isIntersecting && e.target.classList.add('visible')),
       { threshold: 0.08 }
     );
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
     const sectionIo = new IntersectionObserver(
       (entries) => entries.forEach(e => e.isIntersecting && setActiveSection(e.target.id)),
       { threshold: 0.4 }
     );
     document.querySelectorAll('section[id]').forEach(el => sectionIo.observe(el));
-
     return () => { io.disconnect(); sectionIo.disconnect(); };
   }, []);
 
-  /* ── 3D tilt ── */
   const tilt = (e, el) => {
     const r = el.getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width - 0.5) * 20;
@@ -338,187 +293,112 @@ function App() {
   function calcStats(contributions) {
     const total = contributions.reduce((s, d) => s + d.count, 0);
     const bestDay = Math.max(...contributions.map(d => d.count));
-
     let currentStreak = 0;
     for (let i = contributions.length - 1; i >= 0; i--) {
       if (contributions[i].count > 0) currentStreak++;
       else break;
     }
-
     let longestStreak = 0, running = 0;
     for (const day of contributions) {
       running = day.count > 0 ? running + 1 : 0;
       if (running > longestStreak) longestStreak = running;
     }
-
     return { total, currentStreak, longestStreak, bestDay };
   }
 
-  // ── Helper: format relative date ──
-  function timeAgo(dateStr) {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const days = Math.floor(diff / 86400000);
-    if (days === 0) return 'today';
-    if (days === 1) return 'yesterday';
-    if (days < 30) return `${days} days ago`;
-    const months = Math.floor(days / 30);
-    return `${months} month${months > 1 ? 's' : ''} ago`;
-  }
-
-  // ── Total commits across all repos ──
-  const totalCommits = activityData.commits.reduce(
-    (s, r) => s + r.contributions.totalCount, 0
-  );
+  const totalCommits = activityData.commits.reduce((s, r) => s + r.contributions.totalCount, 0);
   const maxCommits = activityData.commits[0]?.contributions.totalCount || 1;
+  const isCollab = (nameWithOwner) => nameWithOwner.split('/')[0] !== 'KhadzA';
 
   return (
     <div className="content">
-
-      {/* ── Custom cursor ── */}
       <div className="cursor-dot" style={{ left: cursor.x, top: cursor.y }} />
       <div className="cursor-ring" style={{ left: cursorBig.x, top: cursorBig.y }} />
-
-      {/* ── Background ── */}
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-noise" aria-hidden="true" />
       <div className="bg-orbs" aria-hidden="true">
-        <div className="orb orb-1" />
-        <div className="orb orb-2" />
-        <div className="orb orb-3" />
+        <div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" />
       </div>
 
-      {/* ── Header ── */}
       <header className="header">
         <a href="#home" className="logo">
           <FaReact className="logo-icon" />
           <span>Alimun</span>
         </a>
-
         <nav className="nav-links">
           <ul>
             {NAV_LINKS.map(([href, Icon, label]) => (
               <li key={href} className={activeSection === href.slice(1) ? 'active' : ''}>
                 <a href={href}>
-                  <Icon className="nav-icon" />
-                  <span>{label}</span>
-                  <span className="nav-underline" />
+                  <Icon className="nav-icon" /><span>{label}</span><span className="nav-underline" />
                 </a>
               </li>
             ))}
           </ul>
         </nav>
-
         <button className="theme-toggle" onClick={() => setIsDark(d => !d)} aria-label="Toggle theme">
           <div className="toggle-track">
-            <FaRegSun className="sun" />
-            <FaRegMoon className="moon" />
-            <div className="toggle-thumb" />
+            <FaRegSun className="sun" /><FaRegMoon className="moon" /><div className="toggle-thumb" />
           </div>
         </button>
       </header>
 
-      {/* ══════════════════════════════════════════
-          HERO SECTION
-      ══════════════════════════════════════════ */}
+      {/* ══ HERO ══ */}
       <section id="home" className="hero">
-        <div
-          className="parallax-layer layer-back"
-          style={{ transform: `translateY(${scrollY * -0.55}px)` }}
-          aria-hidden="true"
-        >
-          <div className="geo ring ring-1" />
-          <div className="geo ring ring-2" />
-          <div className="geo dot-cluster" />
+        <div className="parallax-layer layer-back" style={{ transform: `translateY(${scrollY * -0.55}px)` }} aria-hidden="true">
+          <div className="geo ring ring-1" /><div className="geo ring ring-2" /><div className="geo dot-cluster" />
         </div>
-
-        <div
-          className="parallax-layer layer-mid"
-          style={{ transform: `translateY(${scrollY * -0.30}px)` }}
-          aria-hidden="true"
-        >
-          <div className="geo tri tri-1" />
-          <div className="geo tri tri-2" />
-          <div className="geo line-v line-1" />
-          <div className="geo line-v line-2" />
-          <div className="geo line-h" />
+        <div className="parallax-layer layer-mid" style={{ transform: `translateY(${scrollY * -0.30}px)` }} aria-hidden="true">
+          <div className="geo tri tri-1" /><div className="geo tri tri-2" />
+          <div className="geo line-v line-1" /><div className="geo line-v line-2" /><div className="geo line-h" />
         </div>
-
-        <div
-          className="parallax-layer layer-front"
-          style={{ transform: `translateY(${scrollY * -0.10}px)` }}
-          aria-hidden="true"
-        >
-          <div className="geo corner corner-tl" />
-          <div className="geo corner corner-br" />
+        <div className="parallax-layer layer-front" style={{ transform: `translateY(${scrollY * -0.10}px)` }} aria-hidden="true">
+          <div className="geo corner corner-tl" /><div className="geo corner corner-br" />
           <div className="geo floating-badge">// DEV</div>
-          <div className="geo grid-dots">
-            {[...Array(25)].map((_, i) => <span key={i} />)}
-          </div>
+          <div className="geo grid-dots">{[...Array(25)].map((_, i) => <span key={i} />)}</div>
         </div>
-
-        <div
-          className="hero-content"
-          style={{ transform: `translateY(${scrollY * 0.25}px)`, opacity: Math.max(0, 1 - scrollY / 600) }}
-        >
+        <div className="hero-content" style={{ transform: `translateY(${scrollY * 0.25}px)`, opacity: Math.max(0, 1 - scrollY / 600) }}>
           <div className="hero-eyebrow reveal">
             <span className="eyebrow-line" />&nbsp; Welcome to my portfolio &nbsp;<span className="eyebrow-line" />
           </div>
-
           <h1 className="hero-name reveal">
-            <span className="glitch" data-text="Al-khazri">Al-khazri</span>
-            <br />
+            <span className="glitch" data-text="Al-khazri">Al-khazri</span><br />
             <span className="glitch name-second" data-text="Alim">Alim</span>
           </h1>
-
           <div className="hero-roles reveal">
             {['Frontend', 'React', 'PHP', 'Node.js'].map((r, i) => (
               <span key={r} className="role-pill" style={{ animationDelay: `${0.6 + i * 0.1}s` }}>{r}</span>
             ))}
           </div>
-
           <p className="hero-quote reveal">
             Why is 6 afraid of 7? Because 7 8 9!<br />
             I'm a developer passionate about building engaging experiences.
           </p>
-
           <div className="hero-cta reveal">
             <a href="#projects" className="btn-primary">
               <span>View Projects</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </a>
             <a href="#contact" className="btn-outline">Get in Touch</a>
           </div>
         </div>
-
         <div className="scroll-cue" aria-hidden="true">
           <div className="scroll-mouse"><div className="scroll-wheel" /></div>
           <span>scroll</span>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          SKILLS
-      ══════════════════════════════════════════ */}
+      {/* ══ SKILLS ══ */}
       <section id="skills" className="section">
         <div className="section-head reveal">
-          <span className="section-num">// 01</span>
-          <h2>Skills</h2>
-          <div className="section-line" />
+          <span className="section-num">// 01</span><h2>Skills</h2><div className="section-line" />
         </div>
-
         <div className="skills-grid">
           {SKILLS.map((skill, i) => (
-            <div
-              key={skill.title}
-              className="skill-card reveal"
+            <div key={skill.title} className="skill-card reveal"
               style={{ '--accent': skill.color, '--delay': `${i * 0.1}s` }}
-              onMouseMove={e => tilt(e, e.currentTarget)}
-              onMouseLeave={e => resetTilt(e.currentTarget)}
-            >
-              <div className="skill-card-glow" />
-              <div className="skill-card-border" />
+              onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
+              <div className="skill-card-glow" /><div className="skill-card-border" />
               <h3 className="skill-title">{skill.title}</h3>
               <div className="skill-icons">
                 {skill.items.map(item => (
@@ -530,9 +410,7 @@ function App() {
               </div>
               {skill.level && (
                 <div className="skill-bar-wrap">
-                  <div className="skill-bar">
-                    <div className="skill-fill" style={{ '--level': `${skill.level}%` }} />
-                  </div>
+                  <div className="skill-bar"><div className="skill-fill" style={{ '--level': `${skill.level}%` }} /></div>
                   <span className="skill-label">Intermediate</span>
                 </div>
               )}
@@ -541,36 +419,21 @@ function App() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          PROJECTS
-      ══════════════════════════════════════════ */}
+      {/* ══ PROJECTS ══ */}
       <section id="projects" className="section">
         <div className="section-head reveal">
-          <span className="section-num">// 02</span>
-          <h2>Projects</h2>
-          <div className="section-line" />
+          <span className="section-num">// 02</span><h2>Projects</h2><div className="section-line" />
         </div>
-
         <div className="projects-grid">
           {PROJECTS.map((p, i) => (
-            <div
-              key={p.title}
-              className="project-card reveal"
-              style={{ '--delay': `${i * 0.08}s` }}
-              onMouseMove={e => tilt(e, e.currentTarget)}
-              onMouseLeave={e => resetTilt(e.currentTarget)}
-            >
+            <div key={p.title} className="project-card reveal" style={{ '--delay': `${i * 0.08}s` }}
+              onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
               <div className="project-num">{p.num}</div>
               <div className="project-img-area">
                 <div className="img-placeholder">
                   {p.preview ? (
-                    <img
-                      src={p.preview}
-                      alt={p.title}
-                      className="project-preview-img"
-                      loading="lazy"
-                      onError={e => { e.currentTarget.style.display = 'none' }}
-                    />
+                    <img src={p.preview} alt={p.title} className="project-preview-img" loading="lazy"
+                      onError={e => { e.currentTarget.style.display = 'none' }} />
                   ) : (
                     <>
                       <div className="placeholder-grid">
@@ -582,11 +445,8 @@ function App() {
                 </div>
               </div>
               <div className="project-body">
-                <h3>{p.title}</h3>
-                <p>{p.desc}</p>
-                <div className="tech-row">
-                  {p.tech.map(t => <span key={t} className="tech-tag">{t}</span>)}
-                </div>
+                <h3>{p.title}</h3><p>{p.desc}</p>
+                <div className="tech-row">{p.tech.map(t => <span key={t} className="tech-tag">{t}</span>)}</div>
                 <div className="project-actions">
                   {p.viewClass === 'btn-private' ? (
                     <div className="btn-tooltip-wrap">
@@ -598,7 +458,6 @@ function App() {
                   ) : (
                     <button className={p.viewClass} disabled>View Project</button>
                   )}
-
                   {p.demoUrl ? (
                     <a href={p.demoUrl} target="_blank" rel="noopener noreferrer" className={p.demoClass}>Live Demo</a>
                   ) : (
@@ -611,133 +470,141 @@ function App() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          CONTRIBUTION
-      ══════════════════════════════════════════ */}
+      {/* ══ CONTRIBUTION ══ */}
       <section id="contribution" className="section">
         <div className="section-head reveal">
-          <span className="section-num">// 03</span>
-          <h2>Contribution</h2>
-          <div className="section-line" />
+          <span className="section-num">// 03</span><h2>Contribution</h2><div className="section-line" />
         </div>
 
         <div className="contrib-wrap reveal">
-          <FaGithub className="contrib-gh-icon" />
-          <p className="contrib-label">GitHub Contribution Graph</p>
 
-          <div className="gh-stats-row">
-            {[
-              { label: 'Total Contributions', value: ghStats.total, icon: '⬡' },
-              { label: 'Current Streak', value: `${ghStats.currentStreak}d`, icon: '🔥' },
-              { label: 'Longest Streak', value: `${ghStats.longestStreak}d`, icon: '⚡' },
-              { label: 'Best Day', value: ghStats.bestDay, icon: '★' },
-            ].map(stat => (
-              <div key={stat.label} className="gh-stat-card">
-                <span className="gh-stat-icon">{stat.icon}</span>
-                <span className="gh-stat-value">{stat.value}</span>
-                <span className="gh-stat-label">{stat.label}</span>
-              </div>
-            ))}
+          {/* Header row */}
+          <div className="contrib-header-row">
+            <div className="contrib-title-group">
+              <FaGithub className="contrib-gh-icon" />
+              <span className="contrib-label">GitHub Contribution Graph</span>
+            </div>
           </div>
 
-          <div className="contrib-grid">
-            {Array.from({ length: 52 }, (_, w) =>
-              contribData.slice(w * 7, w * 7 + 7)
-            ).map((week, w) => (
-              <div key={w} className="contrib-week">
-                {week.map((day, d) => {
-                  const level = Math.min(day.count > 0 ? Math.ceil(day.count / 3) : 0, 4);
-                  return (
-                    <div
-                      key={d}
-                      className={`contrib-cell level-${level}`}
-                      title={`${day.date}: ${day.count} contributions`}
-                      style={{ animationDelay: `${(w * 7 + d) * 0.005}s` }}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+          {/* Heatmap */}
+          <div className="contrib-heatmap-wrap">
+            <div className="contrib-grid">
+              {Array.from({ length: 52 }, (_, w) =>
+                contribData.slice(w * 7, w * 7 + 7)
+              ).map((week, w) => (
+                <div key={w} className="contrib-week">
+                  {week.map((day, d) => {
+                    const level = Math.min(day.count > 0 ? Math.ceil(day.count / 3) : 0, 4);
+                    return (
+                      <div key={d} className={`contrib-cell level-${level}`}
+                        title={`${day.date}: ${day.count} contributions`}
+                        style={{ animationDelay: `${(w * 7 + d) * 0.005}s` }} />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            <div className="contrib-legend">
+              <span>Less</span>
+              {[0, 1, 2, 3, 4].map(l => (
+                <div key={l} className={`contrib-cell level-${l}`} style={{ animationDelay: '0s' }} />
+              ))}
+              <span>More</span>
+            </div>
           </div>
 
-          {/* ── Activity Feed (only shown when token is set) ── */}
-          {(activityData.commits.length > 0 || activityData.pullRequests.length > 0) && (
-            <div className="activity-feed">
+          {/* Stats + Repo list */}
+          <div className="contrib-bottom">
 
-              {/* ── Commit activity ── */}
-              {activityData.commits.length > 0 && (
-                <div className="activity-block">
-                  <div className="activity-block-header">
+            {/* 2×2 stat cards */}
+            <div className="gh-stats-grid">
+              {[
+                { label: 'Total', value: ghStats.total, icon: '⬡', color: 'var(--cyan)' },
+                { label: 'Best Day', value: ghStats.bestDay, icon: '★', color: 'var(--gold)' },
+                { label: 'Cur. Streak', value: `${ghStats.currentStreak}d`, icon: '🔥', color: 'var(--magenta)' },
+                { label: 'Longest', value: `${ghStats.longestStreak}d`, icon: '⚡', color: 'var(--green)' },
+              ].map(stat => (
+                <div key={stat.label} className="gh-stat-card" style={{ '--stat-color': stat.color }}>
+                  <span className="gh-stat-icon">{stat.icon}</span>
+                  <span className="gh-stat-value">{stat.value}</span>
+                  <span className="gh-stat-label">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Repo activity panel */}
+            {activityData.commits.length > 0 && (
+              <div className="activity-panel">
+                <div className="activity-panel-header">
+                  <div className="activity-panel-title-row">
                     <span className="activity-dot commit-dot" />
-                    <span>
-                      Created <strong>{totalCommits}</strong> commits in <strong>{activityData.commits.length}</strong> {activityData.commits.length === 1 ? 'repository' : 'repositories'}
+                    <span className="activity-panel-title">
+                      <strong>{totalCommits}</strong> commits &middot; <strong>{activityData.commits.length}</strong> repos
                     </span>
                   </div>
-                  <div className="activity-repos">
-                    {activityData.commits.map(r => {
-                      const pct = (r.contributions.totalCount / maxCommits) * 100;
-                      return (
-                        <div key={r.repository.nameWithOwner} className="activity-repo-row">
-                          <span className="activity-repo-name">{r.repository.nameWithOwner}</span>
-                          <span className="activity-repo-count">
-                            {r.contributions.totalCount} {r.contributions.totalCount === 1 ? 'commit' : 'commits'}
-                          </span>
-                          <div className="activity-bar">
-                            <div
-                              className="activity-bar-fill"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="activity-legend">
+                    <span className="repo-badge badge-personal">personal</span>
+                    <span className="repo-badge badge-collab">collab</span>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
 
+                <div className="activity-repos-list">
+                  {activityData.commits.map(r => {
+                    const collab = isCollab(r.repository.nameWithOwner);
+                    const pct = (r.contributions.totalCount / maxCommits) * 100;
+                    const repoName = r.repository.nameWithOwner.split('/')[1];
+                    const repoOwner = r.repository.nameWithOwner.split('/')[0];
+                    return (
+                      <div key={r.repository.nameWithOwner} className="activity-repo-row">
+                        <div className="repo-row-top">
+                          <div className="repo-name-group">
+                            {collab && <span className="repo-owner-prefix">{repoOwner}/</span>}
+                            <span className="repo-name">{repoName}</span>
+                            <span className={`repo-badge ${collab ? 'badge-collab' : 'badge-personal'}`}>
+                              {collab ? 'collab' : 'personal'}
+                            </span>
+                          </div>
+                          <span className="repo-commit-count">{r.contributions.totalCount}</span>
+                        </div>
+                        <div className="repo-bar-track">
+                          <div className="repo-bar-fill"
+                            style={{ width: `${pct}%`, '--bar-color': collab ? '#a371f7' : 'var(--cyan)' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
-      </section >
+      </section>
 
-      {/* ══════════════════════════════════════════
-          EDUCATION
-      ══════════════════════════════════════════ */}
-      < section id="education" className="section" >
+      {/* ══ EDUCATION ══ */}
+      <section id="education" className="section">
         <div className="section-head reveal">
-          <span className="section-num">// 04</span>
-          <h2>Education &amp; Certifications</h2>
-          <div className="section-line" />
+          <span className="section-num">// 04</span><h2>Education &amp; Certifications</h2><div className="section-line" />
         </div>
-
         <div className="edu-timeline reveal">
           {EDUCATION.map((e, i) => (
             <div key={i} className="edu-timeline-item">
-              <div className="edu-timeline-left">
-                <span className="edu-year">{e.year}</span>
-              </div>
+              <div className="edu-timeline-left"><span className="edu-year">{e.year}</span></div>
               <div className="edu-timeline-spine">
                 <div className="edu-dot" />
                 {i < EDUCATION.length - 1 && <div className="edu-line" />}
               </div>
               <div className="edu-card">
-                <h3>{e.degree}</h3>
-                {e.school && <p>{e.school}</p>}
+                <h3>{e.degree}</h3>{e.school && <p>{e.school}</p>}
               </div>
             </div>
           ))}
         </div>
-
         <h3 className="certs-heading reveal">Certifications</h3>
         <div className="certs-grid">
           {CERTS.map((c, i) => (
-            <div
-              key={c.title}
-              className="cert-card reveal"
-              style={{ '--delay': `${i * 0.1}s` }}
-              onMouseMove={e => tilt(e, e.currentTarget)}
-              onMouseLeave={e => resetTilt(e.currentTarget)}
-            >
+            <div key={c.title} className="cert-card reveal" style={{ '--delay': `${i * 0.1}s` }}
+              onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
               <span className="cert-year">{c.year}</span>
               <h4>{c.title}</h4>
               <p className="cert-org">{c.org}</p>
@@ -746,18 +613,13 @@ function App() {
             </div>
           ))}
         </div>
-      </section >
+      </section>
 
-      {/* ══════════════════════════════════════════
-          CONTACT
-      ══════════════════════════════════════════ */}
-      < section id="contact" className="section section-contact" >
+      {/* ══ CONTACT ══ */}
+      <section id="contact" className="section section-contact">
         <div className="section-head reveal">
-          <span className="section-num">// 05</span>
-          <h2>Contact</h2>
-          <div className="section-line" />
+          <span className="section-num">// 05</span><h2>Contact</h2><div className="section-line" />
         </div>
-
         <div className="contact-wrap">
           <p className="contact-tagline reveal">Let's build something together.</p>
           <div className="contact-cards reveal">
@@ -775,14 +637,13 @@ function App() {
             </a>
           </div>
         </div>
-      </section >
+      </section>
 
       <footer className="footer">
         <div className="footer-line" />
         <p>&copy; 2026 Al-khazri Alim. All rights reserved.</p>
       </footer>
-
-    </div >
+    </div>
   );
 }
 
