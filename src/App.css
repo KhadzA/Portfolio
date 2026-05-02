@@ -30,7 +30,6 @@
     --section-gap: 140px;
 }
 
-/* ── FIX: Light-mode variables on html.light so body + all children update ── */
 html.light {
     color-scheme: light;
     --bg: #f0f4ff;
@@ -141,7 +140,7 @@ img {
 }
 
 /* ════════════════════════════════════════════════════
-   BACKGROUND — transitions with theme
+   BACKGROUND
 ════════════════════════════════════════════════════ */
 .bg-grid {
     position: fixed;
@@ -213,7 +212,6 @@ html.light .bg-grid {
     animation-delay: -15s;
 }
 
-/* Light mode orbs are softer */
 html.light .orb-1 {
     background: radial-gradient(circle, rgba(0, 119, 255, 0.10), transparent 70%);
 }
@@ -411,7 +409,6 @@ html.light .toggle-thumb {
     position: absolute;
 }
 
-/* Rings */
 .ring {
     border-radius: 50%;
     border: 1px solid;
@@ -443,7 +440,6 @@ html.light .toggle-thumb {
     }
 }
 
-/* Dot cluster */
 .dot-cluster {
     top: 60px;
     right: 30%;
@@ -466,7 +462,6 @@ html.light .toggle-thumb {
     }
 }
 
-/* Triangles */
 .tri {
     width: 0;
     height: 0;
@@ -501,7 +496,6 @@ html.light .toggle-thumb {
     }
 }
 
-/* Lines */
 .line-v {
     width: 1px;
     background: linear-gradient(to bottom, transparent, rgba(0, 245, 255, 0.35), transparent);
@@ -543,7 +537,6 @@ html.light .toggle-thumb {
     }
 }
 
-/* Corners */
 .corner {
     width: 40px;
     height: 40px;
@@ -597,7 +590,6 @@ html.light .toggle-thumb {
     }
 }
 
-/* Floating badge */
 .floating-badge {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -624,7 +616,6 @@ html.light .toggle-thumb {
     }
 }
 
-/* Grid dots */
 .grid-dots {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -641,7 +632,6 @@ html.light .toggle-thumb {
     display: block;
 }
 
-/* ── Hero Content ── */
 .hero-content {
     position: relative;
     z-index: 10;
@@ -672,7 +662,6 @@ html.light .toggle-thumb {
     background: var(--text-dim);
 }
 
-/* Glitch */
 .hero-name {
     font-family: var(--font-display);
     font-size: clamp(54px, 10vw, 120px);
@@ -868,7 +857,6 @@ html.light .toggle-thumb {
     transform: translateY(-2px);
 }
 
-/* Scroll cue */
 .scroll-cue {
     position: absolute;
     bottom: 40px;
@@ -940,12 +928,6 @@ html.light .toggle-thumb {
     margin: 0 auto;
 }
 
-@media (max-width: 900px) {
-    .section {
-        padding: 80px 24px;
-    }
-}
-
 .section-head {
     display: flex;
     align-items: center;
@@ -976,7 +958,6 @@ html.light .toggle-thumb {
     background: linear-gradient(to right, var(--border), transparent);
 }
 
-/* Reveal */
 .reveal {
     opacity: 0;
     transform: translateY(32px);
@@ -1122,7 +1103,7 @@ html.light .skill-bar {
 ════════════════════════════════════════════════════ */
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 24px;
 }
 
@@ -1207,7 +1188,6 @@ html.light .project-preview-img {
     transition: opacity 0.2s;
 }
 
-/* little arrow */
 .btn-tooltip-wrap .btn-tooltip::after {
     content: '';
     position: absolute;
@@ -1322,7 +1302,8 @@ html.light .tech-tag {
     flex-wrap: wrap;
 }
 
-.project-actions a {
+.project-actions a,
+.project-actions button {
     padding: 9px 18px;
     border-radius: 6px;
     font-family: var(--font-body);
@@ -1332,16 +1313,6 @@ html.light .tech-tag {
     transition: all 0.2s;
     display: inline-block;
     text-align: center;
-}
-
-.project-actions button {
-    padding: 9px 18px;
-    border-radius: 6px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 600;
-    border: 1px solid;
-    transition: all 0.2s;
 }
 
 .btn-view {
@@ -1385,7 +1356,7 @@ html.light .tech-tag {
 }
 
 /* ════════════════════════════════════════════════════
-   CONTRIBUTION — redesigned
+   CONTRIBUTION
 ════════════════════════════════════════════════════ */
 .contrib-wrap {
     background: var(--surface);
@@ -1398,7 +1369,6 @@ html.light .tech-tag {
     transition: background 0.35s, border-color 0.35s;
 }
 
-/* ── Header row ── */
 .contrib-header-row {
     display: flex;
     align-items: center;
@@ -1441,7 +1411,6 @@ html.light .tech-tag {
     transition: color 0.35s;
 }
 
-/* ── Heatmap ── */
 .contrib-heatmap-wrap {
     display: flex;
     flex-direction: column;
@@ -1492,24 +1461,6 @@ html.light .contrib-cell {
     box-shadow: 0 0 4px rgba(0, 245, 255, 0.5);
 }
 
-html.light .contrib-cell.level-1 {
-    background: rgba(0, 119, 255, 0.20);
-}
-
-html.light .contrib-cell.level-2 {
-    background: rgba(0, 119, 255, 0.45);
-}
-
-html.light .contrib-cell.level-3 {
-    background: rgba(0, 119, 255, 0.70);
-}
-
-html.light .contrib-cell.level-4 {
-    background: rgba(0, 119, 255, 0.90);
-    box-shadow: 0 0 4px rgba(0, 119, 255, 0.5);
-}
-
-/* Legend */
 .contrib-legend {
     display: flex;
     align-items: center;
@@ -1534,7 +1485,6 @@ html.light .contrib-cell.level-4 {
     }
 }
 
-/* ── Bottom: stats + panel ── */
 .contrib-bottom {
     display: grid;
     grid-template-columns: 220px 1fr;
@@ -1542,13 +1492,6 @@ html.light .contrib-cell.level-4 {
     align-items: start;
 }
 
-@media (max-width: 760px) {
-    .contrib-bottom {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ── 2×2 stat grid ── */
 .gh-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1594,7 +1537,6 @@ html.light .contrib-cell.level-4 {
     transition: color 0.35s;
 }
 
-/* ── Activity panel (repo list) ── */
 .activity-panel {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border);
@@ -1646,14 +1588,12 @@ html.light .activity-panel {
     transition: color 0.35s;
 }
 
-/* Legend row for badges */
 .activity-legend {
     display: flex;
     gap: 6px;
     align-items: center;
 }
 
-/* ── Scrollable repo list ── */
 .activity-repos-list {
     display: flex;
     flex-direction: column;
@@ -1678,7 +1618,6 @@ html.light .activity-panel {
     border-radius: 2px;
 }
 
-/* ── Repo row ── */
 .activity-repo-row {
     display: flex;
     flex-direction: column;
@@ -1727,7 +1666,6 @@ html.light .activity-panel {
     transition: color 0.35s;
 }
 
-/* Bar */
 .repo-bar-track {
     height: 3px;
     background: rgba(255, 255, 255, 0.06);
@@ -1747,7 +1685,6 @@ html.light .repo-bar-track {
     opacity: 0.85;
 }
 
-/* ── Badges ── */
 .repo-badge {
     display: inline-block;
     font-family: var(--font-mono);
@@ -1866,7 +1803,7 @@ html.light .badge-personal {
 
 .certs-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
 }
 
@@ -2039,50 +1976,6 @@ html.light .cert-card {
     transition: color 0.35s;
 }
 
-.gh-stats-row {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-}
-
-.gh-stat-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 1rem 1.5rem;
-    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-    border-radius: 12px;
-    background: color-mix(in srgb, var(--accent) 6%, transparent);
-    min-width: 130px;
-    transition: transform 0.2s;
-}
-
-.gh-stat-card:hover {
-    transform: translateY(-3px);
-}
-
-.gh-stat-icon {
-    font-size: 1.4rem;
-}
-
-.gh-stat-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--accent);
-}
-
-.gh-stat-label {
-    font-size: 0.72rem;
-    opacity: 0.6;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-
 /* ════════════════════════════════════════════════════
    FOOTER
 ════════════════════════════════════════════════════ */
@@ -2106,6 +1999,15 @@ html.light .cert-card {
 /* ════════════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════════════ */
+
+/* ── ≤ 900px: reduce section padding ── */
+@media (max-width: 900px) {
+    .section {
+        padding: 80px 24px;
+    }
+}
+
+/* ── ≤ 768px: nav hidden, hero shrinks, layout adjustments ── */
 @media (max-width: 768px) {
     .nav-links {
         display: none;
@@ -2124,12 +2026,126 @@ html.light .cert-card {
         height: 300px;
     }
 
+    /* Section head: allow wrapping so long titles don't overflow */
+    .section-head {
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        margin-bottom: 40px;
+    }
+
+    .section-head h2 {
+        white-space: normal;
+        font-size: clamp(22px, 5.5vw, 36px);
+    }
+
+    /* Push the decorative line to its own row */
+    .section-line {
+        flex: none;
+        width: 100%;
+        order: 3;
+    }
+
+    /* Education timeline: collapse year column into the card area */
+    .edu-timeline-item {
+        grid-template-columns: 20px 1fr;
+        grid-template-rows: auto auto;
+        gap: 0 12px;
+    }
+
+    .edu-timeline-left {
+        grid-column: 2;
+        grid-row: 1;
+        text-align: left;
+        padding-top: 0;
+        padding-bottom: 4px;
+    }
+
+    .edu-timeline-spine {
+        grid-column: 1;
+        grid-row: 1 / 3;
+    }
+
+    .edu-card {
+        grid-column: 2;
+        grid-row: 2;
+        padding-bottom: 28px;
+    }
+
+    /* Contact cards: full width with tighter horizontal padding */
     .contact-card {
         min-width: unset;
         width: 100%;
+        padding: 28px 24px;
+    }
+
+    /* Reduce contact tagline margin on mobile */
+    .contact-tagline {
+        margin-bottom: 32px;
     }
 }
 
+/* ── ≤ 760px: fix contrib-bottom gap after it collapses to 1 col ── */
+@media (max-width: 760px) {
+    .contrib-bottom {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* ── ≤ 640px: shrink heatmap cells, simplify grids ── */
+@media (max-width: 640px) {
+
+    /* Heatmap: 9px cell + 2px gap × 52 ≈ 572px (fits landscape) */
+    .contrib-wrap {
+        padding: 20px 14px;
+        gap: 18px;
+    }
+
+    .contrib-cell {
+        width: 9px;
+        height: 9px;
+    }
+
+    .contrib-grid {
+        gap: 2px;
+    }
+
+    .contrib-week {
+        gap: 2px;
+    }
+
+    .gh-stats-grid {
+        gap: 8px;
+    }
+
+    .gh-stat-value {
+        font-size: 1.2rem;
+    }
+
+    .activity-panel {
+        padding: 12px 14px;
+    }
+
+    .contrib-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    /* Force all auto grids to single column on small phones */
+    .skills-grid,
+    .projects-grid,
+    .certs-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Cert cards don't need as much padding at single-column */
+    .cert-card {
+        padding: 22px 20px;
+    }
+}
+
+/* ── ≤ 480px: hero CTA stacks, section head tightens further ── */
 @media (max-width: 480px) {
     .hero-cta {
         flex-direction: column;
@@ -2140,5 +2156,81 @@ html.light .cert-card {
     .btn-outline {
         width: 100%;
         justify-content: center;
+    }
+
+    .section-head {
+        margin-bottom: 28px;
+    }
+
+    .section-head h2 {
+        font-size: clamp(18px, 6vw, 26px);
+    }
+
+    .section-num {
+        font-size: 12px;
+    }
+
+    /* Project card body padding tighter */
+    .project-body {
+        padding: 16px 16px 20px;
+    }
+
+    /* Contact card value wraps gracefully */
+    .contact-value {
+        font-size: 14px;
+        word-break: break-all;
+    }
+}
+
+/* ── ≤ 440px: heatmap cells at minimum, stat cards tighter ── */
+@media (max-width: 440px) {
+
+    /* 7px cell + 2px gap × 52 ≈ 470px; overflow-x: auto is the safety net */
+    .contrib-wrap {
+        padding: 16px 10px;
+    }
+
+    .contrib-cell {
+        width: 7px;
+        height: 7px;
+        border-radius: 1px;
+    }
+
+    .gh-stat-value {
+        font-size: 1.1rem;
+    }
+
+    .gh-stat-label {
+        font-size: 8px;
+    }
+
+    .gh-stat-card {
+        padding: 12px 6px;
+    }
+
+    .contrib-bottom {
+        gap: 1rem;
+    }
+
+    .activity-repos-list {
+        max-height: 200px;
+    }
+
+    .repo-name {
+        font-size: 11px;
+    }
+
+    /* Education timeline: tighter on very small screens */
+    .edu-card h3 {
+        font-size: 13px;
+    }
+
+    .edu-card {
+        padding-bottom: 20px;
+    }
+
+    /* Header: tighten padding */
+    .header {
+        padding: 0 16px;
     }
 }
