@@ -132,6 +132,10 @@ img {
     transition: width 0.2s ease, height 0.2s ease, opacity 0.5s ease;
 }
 
+.content {
+    overflow-x: hidden;
+}
+
 .content:has(a:hover) .cursor-ring,
 .content:has(button:hover) .cursor-ring {
     width: 56px;
@@ -1361,13 +1365,14 @@ html.light .tech-tag {
 .contrib-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
+    min-width: 0;
+    overflow: hidden;
     border-radius: 16px;
     padding: 32px;
     display: flex;
     flex-direction: column;
     gap: 24px;
     transition: background 0.35s, border-color 0.35s;
-    min-width: 0;
 }
 
 .contrib-header-row {
@@ -1418,6 +1423,7 @@ html.light .tech-tag {
     gap: 8px;
     overflow-x: auto;
     min-width: 0;
+    max-width: 100%;
 }
 
 .contrib-grid {
@@ -1624,6 +1630,7 @@ html.light .activity-panel {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    min-width: 0;
 }
 
 .repo-row-top {
@@ -1631,6 +1638,7 @@ html.light .activity-panel {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    min-width: 0;
 }
 
 .repo-name-group {
