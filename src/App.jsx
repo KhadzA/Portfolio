@@ -189,6 +189,8 @@ function App() {
   const [activityData, setActivityData] = useState({ commits: [] });
   const cursorBigRef = useRef({ x: -100, y: -100 });
   const rafRef = useRef(null);
+  const cursorHideRef = useRef(null);
+  const [cursorVisible, setCursorVisible] = useState(false);
 
   const [ghStats, setGhStats] = useState({
     total: 0, currentStreak: 0, longestStreak: 0, bestDay: 0,
@@ -249,8 +251,16 @@ function App() {
     const onMove = (e) => {
       setCursor({ x: e.clientX, y: e.clientY });
       cursorBigRef.current = { x: e.clientX, y: e.clientY };
+      setCursorVisible(true);
+      clearTimeout(cursorHideRef.current);
+      cursorHideRef.current = setTimeout(() => setCursorVisible(false), 3000);
+    };
+    const onTouch = () => {
+      setCursorVisible(false);
+      clearTimeout(cursorHideRef.current);
     };
     window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchstart', onTouch, { passive: true });
     const lerp = (a, b, t) => a + (b - a) * t;
     let curX = -100, curY = -100;
     const tick = () => {
@@ -262,7 +272,9 @@ function App() {
     rafRef.current = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('touchstart', onTouch);
       cancelAnimationFrame(rafRef.current);
+      clearTimeout(cursorHideRef.current);
     };
   }, []);
 
@@ -312,8 +324,8 @@ function App() {
 
   return (
     <div className="content">
-      <div className="cursor-dot" style={{ left: cursor.x, top: cursor.y }} />
-      <div className="cursor-ring" style={{ left: cursorBig.x, top: cursorBig.y }} />
+      <div className="cursor-dot" style={{ left: cursor.x, top: cursor.y, opacity: cursorVisible ? 1 : 0 }} />
+      <div className="cursor-ring" style={{ left: cursorBig.x, top: cursorBig.y, opacity: cursorVisible ? 1 : 0 }} />
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-noise" aria-hidden="true" />
       <div className="bg-orbs" aria-hidden="true">
@@ -497,8 +509,7 @@ function App() {
                     const level = Math.min(day.count > 0 ? Math.ceil(day.count / 3) : 0, 4);
                     return (
                       <div key={d} className={`contrib-cell level-${level}`}
-                        title={`${day.date}: ${day.count} contributions`}
-                        style={{ animationDelay: `${(w * 7 + d) * 0.005}s` }} />
+                        title={`${day.date}: ${day.count} contributions`} />
                     );
                   })}
                 </div>

@@ -117,7 +117,7 @@ img {
     z-index: 9999;
     transform: translate(-50%, -50%);
     box-shadow: 0 0 12px var(--cyan), 0 0 30px rgba(0, 245, 255, 0.4);
-    transition: transform 0.05s;
+    transition: transform 0.05s, opacity 0.5s ease
 }
 
 .cursor-ring {
@@ -129,7 +129,7 @@ img {
     pointer-events: none;
     z-index: 9998;
     transform: translate(-50%, -50%);
-    transition: width 0.2s ease, height 0.2s ease;
+    transition: width 0.2s ease, height 0.2s ease, opacity 0.5s ease;
 }
 
 .content:has(a:hover) .cursor-ring,
@@ -1367,6 +1367,7 @@ html.light .tech-tag {
     flex-direction: column;
     gap: 24px;
     transition: background 0.35s, border-color 0.35s;
+    min-width: 0;
 }
 
 .contrib-header-row {
@@ -1416,6 +1417,7 @@ html.light .tech-tag {
     flex-direction: column;
     gap: 8px;
     overflow-x: auto;
+    min-width: 0;
 }
 
 .contrib-grid {
