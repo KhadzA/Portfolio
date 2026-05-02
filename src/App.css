@@ -1365,14 +1365,15 @@ html.light .tech-tag {
 .contrib-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
-    min-width: 0;
-    overflow: hidden;
     border-radius: 16px;
     padding: 32px;
     display: flex;
     flex-direction: column;
     gap: 24px;
     transition: background 0.35s, border-color 0.35s;
+    min-width: 0;
+    max-width: 100%;
+
 }
 
 .contrib-header-row {
@@ -1422,7 +1423,10 @@ html.light .tech-tag {
     flex-direction: column;
     gap: 8px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* ← smooth scroll on iOS/Android */
     min-width: 0;
+    /* ← THIS is the actual fix */
     max-width: 100%;
 }
 
@@ -1498,6 +1502,10 @@ html.light .contrib-cell {
     grid-template-columns: 220px 1fr;
     gap: 5rem;
     align-items: start;
+    min-width: 0;
+    /* ← ADD */
+    max-width: 100%;
+    /* ← ADD */
 }
 
 .gh-stats-grid {
@@ -1548,6 +1556,8 @@ html.light .contrib-cell {
 .activity-panel {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border);
+    min-width: 0;
+    overflow: hidden;
     border-radius: 12px;
     padding: 16px 18px;
     display: flex;
