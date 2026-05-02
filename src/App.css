@@ -132,10 +132,6 @@ img {
     transition: width 0.2s ease, height 0.2s ease, opacity 0.5s ease;
 }
 
-.content {
-    overflow-x: hidden;
-}
-
 .content:has(a:hover) .cursor-ring,
 .content:has(button:hover) .cursor-ring {
     width: 56px;
@@ -1103,14 +1099,138 @@ html.light .skill-bar {
 }
 
 /* ════════════════════════════════════════════════════
-   PROJECTS
+   CAROUSEL
 ════════════════════════════════════════════════════ */
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+.carousel {
+    position: relative;
 }
 
+.carousel-viewport {
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 0 12px;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-slide {
+    flex: 0 0 calc(33.333% - 16px);
+    scroll-snap-align: start;
+    min-width: 0;
+}
+
+/* Nav row: holds arrows + dots */
+.carousel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+/* Arrows — on desktop they float over the viewport */
+.carousel-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+    backdrop-filter: blur(12px);
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.carousel-arrow:hover:not(:disabled) {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+.carousel-arrow:disabled {
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+html.light .carousel-arrow {
+    background: var(--bg);
+}
+
+/* Desktop: absolutely position arrows over the viewport */
+@media (min-width: 769px) {
+    .carousel-arrow {
+        position: absolute;
+        top: 45%;
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+
+    .carousel-arrow-left {
+        left: -20px;
+    }
+
+    .carousel-arrow-right {
+        right: -20px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 900px) {
+    .carousel-arrow-left {
+        left: -12px;
+    }
+
+    .carousel-arrow-right {
+        right: -12px;
+    }
+}
+
+/* Dots */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--text-xs);
+    background: transparent;
+    padding: 0;
+    transition: all 0.25s;
+}
+
+.carousel-dot.active {
+    background: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    transform: scale(1.25);
+}
+
+.carousel-dot:hover:not(.active) {
+    border-color: var(--text-dim);
+}
+
+/* ════════════════════════════════════════════════════
+   PROJECTS (now inside carousel)
+════════════════════════════════════════════════════ */
 .project-card {
     position: relative;
     background: var(--surface);
@@ -1119,6 +1239,9 @@ html.light .skill-bar {
     overflow: hidden;
     transition: border-color 0.3s, transform 0.3s, background 0.35s;
     will-change: transform;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 html.light .project-card {
@@ -1257,6 +1380,9 @@ html.light .img-placeholder {
 
 .project-body {
     padding: 20px 22px 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-body h3 {
@@ -1304,6 +1430,7 @@ html.light .tech-tag {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    margin-top: auto;
 }
 
 .project-actions a,
@@ -1360,7 +1487,10 @@ html.light .tech-tag {
 }
 
 /* ════════════════════════════════════════════════════
-   CONTRIBUTION
+   CONTRIBUTION — OVERFLOW FIX
+   The entire chain uses min-width:0 + width:100%
+   so no child can inflate the parent beyond viewport.
+   The heatmap scrolls independently inside its own box.
 ════════════════════════════════════════════════════ */
 .contrib-wrap {
     background: var(--surface);
@@ -1372,8 +1502,7 @@ html.light .tech-tag {
     gap: 24px;
     transition: background 0.35s, border-color 0.35s;
     min-width: 0;
-    max-width: 100%;
-
+    width: 100%;
 }
 
 .contrib-header-row {
@@ -1424,17 +1553,14 @@ html.light .tech-tag {
     gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    /* ← smooth scroll on iOS/Android */
     min-width: 0;
-    /* ← THIS is the actual fix */
-    max-width: 100%;
+    width: 100%;
 }
 
 .contrib-grid {
     display: flex;
     gap: 3px;
     min-width: fit-content;
-    justify-content: center;
 }
 
 .contrib-week {
@@ -1503,15 +1629,14 @@ html.light .contrib-cell {
     gap: 5rem;
     align-items: start;
     min-width: 0;
-    /* ← ADD */
-    max-width: 100%;
-    /* ← ADD */
+    width: 100%;
 }
 
 .gh-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+    min-width: 0;
 }
 
 .gh-stat-card {
@@ -1524,6 +1649,8 @@ html.light .contrib-cell {
     border-radius: 12px;
     background: color-mix(in srgb, var(--stat-color) 5%, transparent);
     transition: transform 0.2s, border-color 0.35s;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .gh-stat-card:hover {
@@ -1556,14 +1683,14 @@ html.light .contrib-cell {
 .activity-panel {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border);
-    min-width: 0;
-    overflow: hidden;
     border-radius: 12px;
     padding: 16px 18px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     transition: background 0.35s, border-color 0.35s;
+    min-width: 0;
+    overflow: hidden;
 }
 
 html.light .activity-panel {
@@ -1576,12 +1703,14 @@ html.light .activity-panel {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 8px;
+    min-width: 0;
 }
 
 .activity-panel-title-row {
     display: flex;
     align-items: center;
     gap: 8px;
+    min-width: 0;
 }
 
 .activity-dot {
@@ -1821,12 +1950,7 @@ html.light .badge-personal {
     transition: color 0.35s;
 }
 
-.certs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-}
-
+/* Cert cards (now inside carousel) */
 .cert-card {
     position: relative;
     padding: 28px;
@@ -1836,6 +1960,9 @@ html.light .badge-personal {
     transition: border-color 0.3s, transform 0.3s, background 0.35s;
     will-change: transform;
     overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 html.light .cert-card {
@@ -1873,6 +2000,7 @@ html.light .cert-card {
     padding: 2px 8px;
     border-radius: 4px;
     margin-bottom: 12px;
+    align-self: flex-start;
 }
 
 .cert-card h4 {
@@ -1910,6 +2038,8 @@ html.light .cert-card {
     font-size: 13px;
     font-weight: 600;
     transition: all 0.2s;
+    margin-top: auto;
+    align-self: flex-start;
 }
 
 .cert-btn:hover {
@@ -2020,6 +2150,13 @@ html.light .cert-card {
    RESPONSIVE
 ════════════════════════════════════════════════════ */
 
+/* ── ≤ 1024px: carousel shows 2 cards ── */
+@media (max-width: 1024px) {
+    .carousel-slide {
+        flex: 0 0 calc(50% - 12px);
+    }
+}
+
 /* ── ≤ 900px: reduce section padding ── */
 @media (max-width: 900px) {
     .section {
@@ -2063,6 +2200,18 @@ html.light .cert-card {
         flex: none;
         width: 100%;
         order: 3;
+    }
+
+    /* Carousel: 1 card at a time */
+    .carousel-slide {
+        flex: 0 0 100%;
+    }
+
+    /* Arrows: smaller in the inline nav row */
+    .carousel-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
     }
 
     /* Education timeline: collapse year column into the card area */
@@ -2152,10 +2301,8 @@ html.light .cert-card {
         gap: 6px;
     }
 
-    /* Force all auto grids to single column on small phones */
-    .skills-grid,
-    .projects-grid,
-    .certs-grid {
+    /* Force skills grid to single column on small phones */
+    .skills-grid {
         grid-template-columns: 1fr;
     }
 

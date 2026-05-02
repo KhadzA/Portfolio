@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
 import {
   FaHome, FaUser, FaCode, FaGithub, FaUserGraduate, FaPhone,
   FaHtml5, FaCss3Alt, FaReact, FaPhp, FaNode, FaGitAlt,
-  FaQuestion, FaRegEye, FaRegSun, FaRegMoon
+  FaQuestion, FaRegEye, FaRegSun, FaRegMoon,
+  FaChevronLeft, FaChevronRight
 } from "react-icons/fa"
 import { BsJavascript } from "react-icons/bs";
 import { SiMysql, SiVite, SiXampp } from "react-icons/si";
@@ -178,6 +179,105 @@ const GH_QUERY = `
   }
 `;
 
+/* ═══════════════════════════════════════
+   CAROUSEL COMPONENT
+═══════════════════════════════════════ */
+function Carousel({ children, className = '' }) {
+  const trackRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [totalSlides, setTotalSlides] = useState(0);
+  const scrollTimeout = useRef(null);
+
+  // Count visible "pages" based on scroll width vs client width
+  const recalc = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const slides = track.children;
+    if (!slides.length) return;
+    setTotalSlides(slides.length);
+  }, []);
+
+  useEffect(() => {
+    recalc();
+    window.addEventListener('resize', recalc);
+    return () => window.removeEventListener('resize', recalc);
+  }, [recalc, children]);
+
+  // Track scroll position to update active dot
+  const handleScroll = useCallback(() => {
+    clearTimeout(scrollTimeout.current);
+    scrollTimeout.current = setTimeout(() => {
+      const track = trackRef.current;
+      if (!track || !track.children.length) return;
+      const slideWidth = track.children[0].offsetWidth;
+      const gap = parseFloat(getComputedStyle(track).gap) || 0;
+      const index = Math.round(track.scrollLeft / (slideWidth + gap));
+      setActiveIndex(Math.min(index, track.children.length - 1));
+    }, 50);
+  }, []);
+
+  const scrollTo = useCallback((index) => {
+    const track = trackRef.current;
+    if (!track || !track.children[index]) return;
+    track.children[index].scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    });
+    setActiveIndex(index);
+  }, []);
+
+  const prev = () => scrollTo(Math.max(0, activeIndex - 1));
+  const next = () => scrollTo(Math.min(totalSlides - 1, activeIndex + 1));
+
+  return (
+    <div className={`carousel ${className}`}>
+      <div className="carousel-viewport">
+        <div
+          className="carousel-track"
+          ref={trackRef}
+          onScroll={handleScroll}
+        >
+          {children}
+        </div>
+      </div>
+
+      {/* Nav: arrows + dots in one row */}
+      <div className="carousel-nav">
+        <button
+          className="carousel-arrow carousel-arrow-left"
+          onClick={prev}
+          disabled={activeIndex === 0}
+          aria-label="Previous"
+        >
+          <FaChevronLeft />
+        </button>
+        <div className="carousel-dots">
+          {Array.from({ length: totalSlides }, (_, i) => (
+            <button
+              key={i}
+              className={`carousel-dot ${i === activeIndex ? 'active' : ''}`}
+              onClick={() => scrollTo(i)}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+        <button
+          className="carousel-arrow carousel-arrow-right"
+          onClick={next}
+          disabled={activeIndex >= totalSlides - 1}
+          aria-label="Next"
+        >
+          <FaChevronRight />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
+   MAIN APP
+═══════════════════════════════════════ */
 function App() {
   const [isDark, setIsDark] = useState(true);
   const [scrollY, setScrollY] = useState(0);
@@ -431,55 +531,57 @@ function App() {
         </div>
       </section>
 
-      {/* ══ PROJECTS ══ */}
+      {/* ══ PROJECTS (CAROUSEL) ══ */}
       <section id="projects" className="section">
         <div className="section-head reveal">
           <span className="section-num">// 02</span><h2>Projects</h2><div className="section-line" />
         </div>
-        <div className="projects-grid">
-          {PROJECTS.map((p, i) => (
-            <div key={p.title} className="project-card reveal" style={{ '--delay': `${i * 0.08}s` }}
-              onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
-              <div className="project-num">{p.num}</div>
-              <div className="project-img-area">
-                <div className="img-placeholder">
-                  {p.preview ? (
-                    <img src={p.preview} alt={p.title} className="project-preview-img" loading="lazy"
-                      onError={e => { e.currentTarget.style.display = 'none' }} />
-                  ) : (
-                    <>
-                      <div className="placeholder-grid">
-                        {[...Array(16)].map((_, j) => <div key={j} className="placeholder-cell" />)}
-                      </div>
-                      <span className="placeholder-label">{p.tech[0]}</span>
-                    </>
-                  )}
+        <Carousel className="reveal">
+          {PROJECTS.map((p) => (
+            <div key={p.title} className="carousel-slide">
+              <div className="project-card"
+                onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
+                <div className="project-num">{p.num}</div>
+                <div className="project-img-area">
+                  <div className="img-placeholder">
+                    {p.preview ? (
+                      <img src={p.preview} alt={p.title} className="project-preview-img" loading="lazy"
+                        onError={e => { e.currentTarget.style.display = 'none' }} />
+                    ) : (
+                      <>
+                        <div className="placeholder-grid">
+                          {[...Array(16)].map((_, j) => <div key={j} className="placeholder-cell" />)}
+                        </div>
+                        <span className="placeholder-label">{p.tech[0]}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="project-body">
-                <h3>{p.title}</h3><p>{p.desc}</p>
-                <div className="tech-row">{p.tech.map(t => <span key={t} className="tech-tag">{t}</span>)}</div>
-                <div className="project-actions">
-                  {p.viewClass === 'btn-private' ? (
-                    <div className="btn-tooltip-wrap">
+                <div className="project-body">
+                  <h3>{p.title}</h3><p>{p.desc}</p>
+                  <div className="tech-row">{p.tech.map(t => <span key={t} className="tech-tag">{t}</span>)}</div>
+                  <div className="project-actions">
+                    {p.viewClass === 'btn-private' ? (
+                      <div className="btn-tooltip-wrap">
+                        <button className={p.viewClass} disabled>View Project</button>
+                        <span className="btn-tooltip">Source code is private</span>
+                      </div>
+                    ) : p.viewUrl ? (
+                      <a href={p.viewUrl} target="_blank" rel="noopener noreferrer" className={p.viewClass}>View Project</a>
+                    ) : (
                       <button className={p.viewClass} disabled>View Project</button>
-                      <span className="btn-tooltip">Source code is private</span>
-                    </div>
-                  ) : p.viewUrl ? (
-                    <a href={p.viewUrl} target="_blank" rel="noopener noreferrer" className={p.viewClass}>View Project</a>
-                  ) : (
-                    <button className={p.viewClass} disabled>View Project</button>
-                  )}
-                  {p.demoUrl ? (
-                    <a href={p.demoUrl} target="_blank" rel="noopener noreferrer" className={p.demoClass}>Live Demo</a>
-                  ) : (
-                    <button className={p.demoClass} disabled>Live Demo</button>
-                  )}
+                    )}
+                    {p.demoUrl ? (
+                      <a href={p.demoUrl} target="_blank" rel="noopener noreferrer" className={p.demoClass}>Live Demo</a>
+                    ) : (
+                      <button className={p.demoClass} disabled>Live Demo</button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
-        </div>
+        </Carousel>
       </section>
 
       {/* ══ CONTRIBUTION ══ */}
@@ -612,18 +714,20 @@ function App() {
           ))}
         </div>
         <h3 className="certs-heading reveal">Certifications</h3>
-        <div className="certs-grid">
-          {CERTS.map((c, i) => (
-            <div key={c.title} className="cert-card reveal" style={{ '--delay': `${i * 0.1}s` }}
-              onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
-              <span className="cert-year">{c.year}</span>
-              <h4>{c.title}</h4>
-              <p className="cert-org">{c.org}</p>
-              <p className="cert-desc">{c.desc}</p>
-              <button className="cert-btn">View Certificate</button>
+        <Carousel className="reveal">
+          {CERTS.map((c) => (
+            <div key={c.title} className="carousel-slide">
+              <div className="cert-card"
+                onMouseMove={e => tilt(e, e.currentTarget)} onMouseLeave={e => resetTilt(e.currentTarget)}>
+                <span className="cert-year">{c.year}</span>
+                <h4>{c.title}</h4>
+                <p className="cert-org">{c.org}</p>
+                <p className="cert-desc">{c.desc}</p>
+                <button className="cert-btn">View Certificate</button>
+              </div>
             </div>
           ))}
-        </div>
+        </Carousel>
       </section>
 
       {/* ══ CONTACT ══ */}
