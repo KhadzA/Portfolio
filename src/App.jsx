@@ -4,7 +4,7 @@ import {
   FaHome, FaUser, FaCode, FaGithub, FaUserGraduate, FaPhone,
   FaHtml5, FaCss3Alt, FaReact, FaPhp, FaNode, FaGitAlt,
   FaQuestion, FaRegEye, FaRegSun, FaRegMoon,
-  FaChevronLeft, FaChevronRight
+  FaChevronLeft, FaChevronRight, FaFireAlt, FaRegStar
 } from "react-icons/fa"
 import { BsJavascript } from "react-icons/bs";
 import { SiMysql, SiVite, SiXampp } from "react-icons/si";
@@ -12,6 +12,8 @@ import { RiSupabaseFill, RiFirebaseFill } from "react-icons/ri";
 import { VscVscode } from "react-icons/vsc";
 import { FaHandshake } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
+import { HiLightningBolt } from "react-icons/hi";
+import { LuOctagon } from "react-icons/lu";
 
 const NAV_LINKS = [
   ['#home', FaHome, 'Home'],
@@ -632,10 +634,10 @@ function App() {
             {/* 2×2 stat cards */}
             <div className="gh-stats-grid">
               {[
-                { label: 'Total', value: ghStats.total, icon: '⬡', color: 'var(--cyan)' },
-                { label: 'Best Day', value: ghStats.bestDay, icon: '★', color: 'var(--gold)' },
-                { label: 'Cur. Streak', value: `${ghStats.currentStreak}d`, icon: '🔥', color: 'var(--magenta)' },
-                { label: 'Longest', value: `${ghStats.longestStreak}d`, icon: '⚡', color: 'var(--green)' },
+                { label: 'Total', value: ghStats.total, icon: <LuOctagon />, color: 'var(--cyan)' },
+                { label: 'Best Day', value: ghStats.bestDay, icon: <FaRegStar />, color: 'var(--gold)' },
+                { label: 'Cur. Streak', value: `${ghStats.currentStreak}d`, icon: <FaFireAlt />, color: 'var(--magenta)' },
+                { label: 'Longest', value: `${ghStats.longestStreak}d`, icon: <HiLightningBolt />, color: 'var(--green)' },
               ].map(stat => (
                 <div key={stat.label} className="gh-stat-card" style={{ '--stat-color': stat.color }}>
                   <span className="gh-stat-icon">{stat.icon}</span>
