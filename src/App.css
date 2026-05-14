@@ -1561,6 +1561,7 @@ html.light .tech-tag {
     display: flex;
     gap: 3px;
     min-width: fit-content;
+    justify-content: center;
 }
 
 .contrib-week {
