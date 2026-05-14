@@ -39,8 +39,10 @@ html.light {
     --text: #111827;
     --text-dim: #4b5563;
     --text-xs: #9ca3af;
-    --cyan: #0077ff;
+    --cyan: #2e8fff;
     --magenta: #d6006b;
+    --gold: #b8860b;
+    --green: #19bb80;
 }
 
 html.dark {
@@ -1462,6 +1464,10 @@ html.light .tech-tag {
     border-color: var(--cyan);
     color: #000;
     font-weight: 700;
+}
+
+html.light .btn-demo {
+    color: #fff;
 }
 
 .btn-demo:hover {

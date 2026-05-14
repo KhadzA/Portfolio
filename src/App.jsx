@@ -281,7 +281,6 @@ function Carousel({ children, className = '' }) {
    MAIN APP
 ═══════════════════════════════════════ */
 function App() {
-  const [isDark, setIsDark] = useState(true);
   const [scrollY, setScrollY] = useState(0);
   const [cursor, setCursor] = useState({ x: -100, y: -100 });
   const [cursorBig, setCursorBig] = useState({ x: -100, y: -100 });
@@ -293,6 +292,12 @@ function App() {
   const rafRef = useRef(null);
   const cursorHideRef = useRef(null);
   const [cursorVisible, setCursorVisible] = useState(false);
+
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved !== null) return saved === 'dark';
+    return true;
+  });
 
   const [ghStats, setGhStats] = useState({
     total: 0, currentStreak: 0, longestStreak: 0, bestDay: 0,
@@ -451,7 +456,15 @@ function App() {
             ))}
           </ul>
         </nav>
-        <button className="theme-toggle" onClick={() => setIsDark(d => !d)} aria-label="Toggle theme">
+        <button
+          className="theme-toggle"
+          onClick={() => setIsDark(d => {
+            const next = !d;
+            localStorage.setItem('theme', next ? 'dark' : 'light');
+            return next;
+          })}
+          aria-label="Toggle theme"
+        >
           <div className="toggle-track">
             <FaRegSun className="sun" /><FaRegMoon className="moon" /><div className="toggle-thumb" />
           </div>
