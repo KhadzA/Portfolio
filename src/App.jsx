@@ -182,7 +182,7 @@ const GH_QUERY = `
 `;
 
 /* ═══════════════════════════════════════
-   CAROUSEL COMPONENT
+   CAROUSEL COMPONENT 
 ═══════════════════════════════════════ */
 function Carousel({ children, className = '' }) {
   const trackRef = useRef(null);
