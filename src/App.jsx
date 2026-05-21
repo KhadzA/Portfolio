@@ -648,10 +648,10 @@ function App() {
             {/* 2×2 stat cards */}
             <div className="gh-stats-grid">
               {[
-                { label: 'Total', value: ghStats.total, icon: <LuOctagon />, color: 'var(--cyan)' },
-                { label: 'Best Day', value: ghStats.bestDay, icon: <FaRegStar />, color: 'var(--gold)' },
-                { label: 'Cur. Streak', value: `${ghStats.currentStreak}d`, icon: <FaFireAlt />, color: 'var(--magenta)' },
-                { label: 'Longest', value: `${ghStats.longestStreak}d`, icon: <HiLightningBolt />, color: 'var(--green)' },
+                { label: 'Total Contributions', value: ghStats.total, icon: <LuOctagon />, color: 'var(--cyan)' },
+                { label: 'Highest Contribution', value: ghStats.bestDay, icon: <FaRegStar />, color: 'var(--gold)' },
+                { label: 'Current Streak', value: `${ghStats.currentStreak}d`, icon: <FaFireAlt />, color: 'var(--magenta)' },
+                { label: 'Longest Streak', value: `${ghStats.longestStreak}d`, icon: <HiLightningBolt />, color: 'var(--green)' },
               ].map(stat => (
                 <div key={stat.label} className="gh-stat-card" style={{ '--stat-color': stat.color }}>
                   <span className="gh-stat-icon">{stat.icon}</span>
