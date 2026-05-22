@@ -317,31 +317,78 @@ function App() {
 
   useEffect(() => {
     const token = import.meta.env.VITE_GITHUB_TOKEN;
+
     if (token) {
-      fetch('https://api.github.com/graphql', {
+      const ranges = [
+        { from: '2023-10-21T00:00:00Z', to: '2023-12-31T23:59:59Z' },
+        { from: '2024-01-01T00:00:00Z', to: '2024-12-31T23:59:59Z' },
+        { from: '2025-01-01T00:00:00Z', to: '2025-12-31T23:59:59Z' },
+        { from: '2026-01-01T00:00:00Z', to: '2026-12-31T23:59:59Z' },
+      ];
+
+      const PER_YEAR_QUERY = `
+      query($from: DateTime!, $to: DateTime!) {
+        user(login: "KhadzA") {
+          contributionsCollection(from: $from, to: $to) {
+            contributionCalendar {
+              weeks {
+                contributionDays { date contributionCount }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+      // Fetch all years for total count + streak stats
+      const allYearsFetch = Promise.all(
+        ranges.map(({ from, to }) =>
+          fetch('https://api.github.com/graphql', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: PER_YEAR_QUERY, variables: { from, to } }),
+          }).then(r => r.json())
+        )
+      );
+
+      // Separate fetch for repo activity (current year only)
+      const repoActivityFetch = fetch('https://api.github.com/graphql', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: GH_QUERY }),
-        //hmmmm
-      })
-        .then(r => r.json())
-        .then(json => {
-          const col = json.data.user.contributionsCollection;
-          const contributions = col.contributionCalendar.weeks.flatMap(week =>
-            week.contributionDays.map(day => ({ date: day.date, count: day.contributionCount }))
-          );
-          setContribData(contributions);
-          setGhStats(calcStats(contributions));
+        body: JSON.stringify({ query: GH_QUERY }), // your original query
+      }).then(r => r.json());
+
+      Promise.all([allYearsFetch, repoActivityFetch])
+        .then(([yearResults, repoJson]) => {
+          const today = new Date().toISOString().slice(0, 10);
+
+          const allContributions = yearResults
+            .flatMap(json =>
+              json.data.user.contributionsCollection.contributionCalendar.weeks.flatMap(week =>
+                week.contributionDays.map(day => ({
+                  date: day.date,
+                  count: day.contributionCount,
+                }))
+              )
+            )
+            .filter(day => day.date <= today);
+
+          const heatmapData = allContributions.slice(-53 * 7);
+
+          setContribData(heatmapData);
+          setGhStats(calcStats(allContributions));
           setHasPrivate(true);
-          setActivityData({ commits: col.commitContributionsByRepository });
+          setActivityData({ commits: repoJson.data.user.contributionsCollection.commitContributionsByRepository });
         })
         .catch(err => {
           console.warn('GitHub GraphQL failed, using public fallback:', err);
           fetchPublicFallback();
         });
+
     } else {
       fetchPublicFallback();
     }
+
     function fetchPublicFallback() {
       fetch('https://github-contributions-api.jogruber.de/v4/KhadzA?y=last')
         .then(r => r.json())
