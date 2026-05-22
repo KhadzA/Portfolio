@@ -619,7 +619,7 @@ function App() {
           {/* Heatmap */}
           <div className="contrib-heatmap-wrap">
             <div className="contrib-grid">
-              {Array.from({ length: 52 }, (_, w) =>
+              {Array.from({ length: Math.ceil(contribData.length / 7) }, (_, w) =>
                 contribData.slice(w * 7, w * 7 + 7)
               ).map((week, w) => (
                 <div key={w} className="contrib-week">
